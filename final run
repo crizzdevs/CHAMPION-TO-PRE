@@ -1,0 +1,76 @@
+package com.mycompany.radixsortrace;
+
+import java.util.Arrays;
+
+public class RadixSortRace {
+
+    //DELAY IN OUTPUT
+    static final int PRINT_DELAY_MS = 2000;
+
+    public static void main(String[] args) throws InterruptedException {
+        //INPUT
+        int[] arr = {42, 7, 89, 15, 63, 28, 91, 3, 56, 77,
+            19, 84, 34, 60, 12, 98, 45, 1, 70, 26,
+            53, 81, 9, 67, 31, 95, 48, 22, 74, 5,
+            86, 38, 64, 17, 100, 52, 29, 73, 14, 90,
+            41, 68, 24, 59, 8, 83, 36, 97, 50, 11,
+            62, 20, 76, 33, 88, 4, 65, 27, 92, 46,
+            16, 71, 39, 85, 2, 58, 80, 30, 94, 54,
+            13, 69, 44, 21, 79, 6, 87, 35, 61, 18,
+            99, 49, 25, 72, 40, 93, 10, 66, 47, 82,
+            32, 55, 75, 23, 57, 37, 96, 78, 51, 43};
+        //OUTPUT
+        System.out.println("Before sorting:");
+        System.out.println(Arrays.toString(arr));
+
+        radixSortNonNegative(arr);
+        
+        //Print after sorting with delay
+        System.out.println("\nAfter sorting:");
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i]);
+            if (i < arr.length - 1) System.out.print(", ");
+            Thread.sleep(PRINT_DELAY_MS);
+        }
+    }
+
+   //PROCESS
+    private static void radixSortNonNegative(int[] arr) {
+        if (arr.length == 0) return;
+
+        int max = Arrays.stream(arr).max().getAsInt();
+
+        for (int exp = 1; max / exp > 0; exp *= 10) {
+            countingSortByDigit(arr, exp);
+        }
+        
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
+    private static void countingSortByDigit(int[] arr, int exp) {
+        int n = arr.length;
+        int[] output = new int[n];
+        int[] count = new int[10];
+
+        for (int i = 0; i < n; i++) {
+            int digit = (arr[i] / exp) % 10;
+            count[digit]++;
+        }
+
+        for (int i = 1; i < 10; i++) {
+            count[i] += count[i - 1];
+        }
+
+        for (int i = n - 1; i >= 0; i--) {
+            int digit = (arr[i] / exp) % 10;
+            output[--count[digit]] = arr[i];
+        }
+        
+        System.arraycopy(output, 0, arr, 0, n);
+    }
+}
